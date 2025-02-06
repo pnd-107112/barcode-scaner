@@ -68,16 +68,21 @@
             let rows = data.split("\n"); // Split by line
             for (let i = 1; i < rows.length; i++) {
                 let cols = rows[i].split(";"); // Use semicolon (;) instead of comma (,)
+                
+                console.log("Scanned Barcode:", barcode);
+                console.log("CSV Row:", cols); // Debugging
+
                 if (cols[0].trim() === barcode.trim()) {
                     document.getElementById("product-info").innerText = 
-                        `Ürün: ${cols[1]}, Ölçü: ${cols[2]}, Detay: ${cols[7]}, Disc Fiyat: ${cols[6]}, Fiyat: ${cols[7]}`;
+                        `Ürün: ${cols[1]}, Ölçü: ${cols[2]}, Detay: ${cols[3]}, Disc Fiyat: ${cols[6]}, Fiyat: ${cols[4]}`;
                     return;
                 }
             }
-            document.getElementById("product-info").innerText = "Product not found!";
+            document.getElementById("product-info").innerText = "Ürün bulunamadı!";
         })
         .catch(error => console.error("Error loading CSV:", error));
 }
+
 
     </script>
 
