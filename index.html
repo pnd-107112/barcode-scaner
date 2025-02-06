@@ -14,11 +14,11 @@
 </head>
 <body>
 
-    <h2>Scan a Barcode</h2>
-    <button id="start-btn">Start Scanning</button>
-    <button id="stop-btn" style="display:none;">Stop Scanning</button>
+    <h2>Barkod Tara</h2>
+    <button id="start-btn">Tarama Başlat</button>
+    <button id="stop-btn" style="display:none;">Tarama durdur</button>
     <div id="scanner"></div>
-    <p id="result">Scanned Code: <span id="barcode"></span></p>
+    <p id="result">Tarama sonuç: <span id="barcode"></span></p>
     <p id="product-info"></p> <!-- Product details will appear here -->
 
     <script>
@@ -70,7 +70,7 @@
                 let cols = rows[i].split(";"); // Use semicolon (;) instead of comma (,)
                 if (cols[0].trim() === barcode.trim()) {
                     document.getElementById("product-info").innerText = 
-                        `Ürün: ${cols[1]}, Ölçü: ${cols[2]}, Ampül: ${cols[3]}, Fiat: ${cols[5]}`;
+                        `Ürün: ${cols[1]}, Ölçü: ${cols[2]}, Ampül: ${cols[3]}, Fiyat: ${cols[4]}`;
                     return;
                 }
             }
