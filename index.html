@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode"></script> <!-- Barcode Scanner Library -->
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        #scanner { width: 100%; max-width: 400px; margin: auto; display: none; }
+        #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>Scan a Barcode</h2>
+    <button id="start-btn">Start Scanning</button>
+    <button id="stop-btn" style="display:none;">Stop Scanning</button>
+    <div id="scanner"></div>
+    <p id="result">Scanned Code: <span id="barcode"></span></p>
+    <p id="product-info"></p> <!-- Product details will appear here -->
+
+    <script>
+        let scanner;
+        let scanning = false;
+
+        document.getElementById("start-btn").addEventListener("click", function() {
+            if (!scanning) {
+                scanner = new Html5Qrcode("scanner");
+                scanner.start(
+                    { facingMode: "environment" }, 
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    onScanSuccess,
+                    onScanError
+                );
+                scanning = true;
+                document.getElementById("scanner").style.display = "block";
+                document.getElementById("start-btn").style.display = "none";
+                document.getElementById("stop-btn").style.display = "inline-block";
+            }
+        });
+
+        document.getElementById("stop-btn").addEventListener("click", function() {
+            if (scanning) {
+                scanner.stop().then(() => {
+                    scanning = false;
+                    document.getElementById("scanner").style.display = "none";
+                    document.getElementById("start-btn").style.display = "inline-block";
+                    document.getElementById("stop-btn").style.display = "none";
+                }).catch(err => console.error("Stop failed:", err));
+            }
+        });
+
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById("barcode").innerText = decodedText;
+            fetchProductDetails(decodedText); // Fetch product info from CSV
+        }
+
+        function onScanError(errorMessage) {
+            console.warn("Scan error:", errorMessage);
+        }
+
+        function fetchProductDetails(barcode) {
+    fetch("product.csv")
+        .then(response => response.text())
+        .then(data => {
+            let rows = data.split("\n"); // Split by line
+            for (let i = 1; i < rows.length; i++) {
+                let cols = rows[i].split(";"); // Use semicolon (;) instead of comma (,)
+                if (cols[0].trim() === barcode.trim()) {
+                    document.getElementById("product-info").innerText = 
+                        `Ürün: ${cols[1]}, Ölçü: ${cols[2]}, Ampül: ${cols[3]}, Fiat: ${cols[5]}`;
+                    return;
+                }
+            }
+            document.getElementById("product-info").innerText = "Product not found!";
+        })
+        .catch(error => console.error("Error loading CSV:", error));
+}
+
+    </script>
+
+</body>
+</html>
