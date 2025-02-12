@@ -4,22 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barcode Scanner</title>
-    <script src="https://unpkg.com/html5-qrcode"></script> <!-- Barcode Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; padding: 20px; }
+        h2 { margin-bottom: 20px; }
+        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); max-width: 500px; margin: auto; }
         #scanner { width: 100%; max-width: 400px; margin: auto; display: none; }
-        #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
+        #result, #product-info { margin-top: 20px; font-size: 18px; font-weight: bold; }
+        button { padding: 12px 20px; font-size: 16px; cursor: pointer; margin: 10px; border: none; border-radius: 5px; }
+        .btn-start { background: #28a745; color: white; }
+        .btn-stop { background: #dc3545; color: white; display: none; }
+        .btn-reset { background: #007bff; color: white; display: none; }
     </style>
 </head>
 <body>
-
-    <h2>Barkod Tara</h2>
-    <button id="start-btn">Tarama Başlat</button>
-    <button id="stop-btn" style="display:none;">Tarama durdur</button>
-    <div id="scanner"></div>
-    <p id="result">Tarama sonuç: <span id="barcode"></span></p>
-    <p id="product-info"></p> <!-- Product details will appear here -->
+    <div class="container">
+        <h2>Barkod Tarama</h2>
+        <button id="start-btn" class="btn-start">Tarama Başlat</button>
+        <button id="stop-btn" class="btn-stop">Tarama Durdur</button>
+        <button id="reset-btn" class="btn-reset">Sıfırla</button>
+        <div id="scanner"></div>
+        <p id="result">Tarama sonucu: <span id="barcode"></span></p>
+        <p id="product-info"></p>
+    </div>
 
     <script>
         let scanner;
@@ -38,6 +46,7 @@
                 document.getElementById("scanner").style.display = "block";
                 document.getElementById("start-btn").style.display = "none";
                 document.getElementById("stop-btn").style.display = "inline-block";
+                document.getElementById("reset-btn").style.display = "inline-block";
             }
         });
 
@@ -52,9 +61,16 @@
             }
         });
 
+        document.getElementById("reset-btn").addEventListener("click", function() {
+            document.getElementById("barcode").innerText = "";
+            document.getElementById("product-info").innerText = "";
+            document.getElementById("reset-btn").style.display = "none";
+        });
+
         function onScanSuccess(decodedText, decodedResult) {
             document.getElementById("barcode").innerText = decodedText;
-            fetchProductDetails(decodedText); // Fetch product info from CSV
+            fetchProductDetails(decodedText);
+            document.getElementById("reset-btn").style.display = "inline-block";
         }
 
         function onScanError(errorMessage) {
@@ -62,29 +78,23 @@
         }
 
         function fetchProductDetails(barcode) {
-    fetch("product.csv")
-        .then(response => response.text())
-        .then(data => {
-            let rows = data.split("\n"); // Split by line
-            for (let i = 1; i < rows.length; i++) {
-                let cols = rows[i].split(";"); // Use semicolon (;) instead of comma (,)
-                
-                console.log("Scanned Barcode:", barcode);
-                console.log("CSV Row:", cols); // Debugging
-
-                if (cols[0].trim() === barcode.trim()) {
-                    document.getElementById("product-info").innerText = 
-                        `Ürün: ${cols[1]}, Ölçü:${cols[2]}, DiscFiyat:${cols[3]}, Fiyat:${cols[4]}`;
-                    return;
-                }
-            }
-            document.getElementById("product-info").innerText = "Ürün bulunamadı!";
-        })
-        .catch(error => console.error("Error loading CSV:", error));
-}
-
-
+            fetch("product.csv")
+                .then(response => response.text())
+                .then(data => {
+                    let rows = data.split("\n");
+                    for (let i = 1; i < rows.length; i++) {
+                        let cols = rows[i].split(";");
+                        if (cols[0].trim() === barcode.trim()) {
+                            document.getElementById("product-info").innerText = 
+                                `Ürün: ${cols[1]}, Ölçü: ${cols[2]}, DiscFiyat: ${cols[3]}, Fiyat: ${cols[4]}`;
+                            return;
+                        }
+                    }
+                    document.getElementById("product-info").innerText = "Ürün bulunamadı!";
+                })
+                .catch(error => console.error("Error loading CSV:", error));
+        }
     </script>
-
 </body>
 </html>
+
