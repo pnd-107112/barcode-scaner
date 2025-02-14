@@ -11,12 +11,12 @@
         h2 { margin-bottom: 20px; }
         .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); max-width: 500px; margin: auto; }
         #scanner { width: 100%; max-width: 400px; margin: auto; display: none; }
-        #result, #product-info { margin-top: 20px; font-size: 18px; font-weight: bold; }
+        #result, #product-info, #product-image { margin-top: 20px; font-size: 18px; font-weight: bold; }
         button { padding: 12px 20px; font-size: 16px; cursor: pointer; margin: 10px; border: none; border-radius: 5px; }
         .btn-start { background: #28a745; color: white; }
         .btn-stop { background: #dc3545; color: white; display: none; }
         .btn-reset { background: #007bff; color: white; display: none; }
-        img { margin-top: 15px; width: 200px; display: none; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        #product-image img { max-width: 100%; height: auto; margin-top: 10px; border-radius: 5px; display: none; }
     </style>
 </head>
 <body>
@@ -28,7 +28,7 @@
         <div id="scanner"></div>
         <p id="result">Tarama sonucu: <span id="barcode"></span></p>
         <p id="product-info"></p>
-        <img id="product-image" src="" alt="Ürün Resmi">
+        <div id="product-image"><img id="barcode-image" src="" alt="Ürün Resmi"></div>
     </div>
 
     <script>
@@ -66,7 +66,7 @@
         document.getElementById("reset-btn").addEventListener("click", function() {
             document.getElementById("barcode").innerText = "";
             document.getElementById("product-info").innerText = "";
-            document.getElementById("product-image").style.display = "none";
+            document.getElementById("barcode-image").style.display = "none";
             document.getElementById("reset-btn").style.display = "none";
         });
 
@@ -90,34 +90,16 @@
                         if (cols[0].trim() === barcode.trim()) {
                             document.getElementById("product-info").innerText = 
                                 `Ürün: ${cols[1]}, Ölçü: ${cols[2]}, DiscFiyat: ${cols[3]}, Fiyat: ${cols[4]}`;
-
-                            // Set image source
-                            let imgElement = document.getElementById("product-image");
-                            let imagePath = `images/${barcode}.jpeg`; // Change extension if needed
-
-                            checkImageExists(imagePath, function(exists) {
-                                if (exists) {
-                                    imgElement.src = imagePath;
-                                    imgElement.style.display = "block";
-                                } else {
-                                    imgElement.style.display = "none";
-                                }
-                            });
-
+                            let imageUrl = `images/${barcode}.jpg`;
+                            document.getElementById("barcode-image").src = imageUrl;
+                            document.getElementById("barcode-image").style.display = "block";
                             return;
                         }
                     }
                     document.getElementById("product-info").innerText = "Ürün bulunamadı!";
-                    document.getElementById("product-image").style.display = "none";
+                    document.getElementById("barcode-image").style.display = "none";
                 })
                 .catch(error => console.error("Error loading CSV:", error));
-        }
-
-        function checkImageExists(url, callback) {
-            let img = new Image();
-            img.src = url;
-            img.onload = () => callback(true);
-            img.onerror = () => callback(false);
         }
     </script>
 </body>
