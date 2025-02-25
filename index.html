@@ -38,7 +38,9 @@
             transition: all 0.3s ease;
             font-weight: 500;
         }
-        input { width: 100%; border: 1px solid #ccc; }
+        input { width: 70%; border: 1px solid #ccc; display: inline-block; }
+        .btn-search { background: #f39c12; color: white; }
+        .btn-search:hover { background: #e67e22; }
         .btn-start { background: #4CAF50; color: white; }
         .btn-start:hover { background: #45a049; }
         .btn-stop { background: #e74c3c; color: white; display: none; }
@@ -60,6 +62,7 @@
     <div class="container">
         <h2>📸 Pandora Barkod Tarama</h2>
         <input type="text" id="search" placeholder="Ürün ismi ile ara...">
+        <button id="search-btn" class="btn-search">🔍 Ara</button>
         <button id="start-btn" class="btn-start">📷 Taramayı Başlat</button>
         <button id="stop-btn" class="btn-stop">⏹ Taramayı Durdur</button>
         <button id="reset-btn" class="btn-reset">🔄 Sıfırla</button>
@@ -126,25 +129,11 @@
                 .then(response => response.text())
                 .then(data => {
                     products = data.split("\n").map(row => row.split(";"));
-                    let found = products.find(cols => cols[0].trim() === barcode.trim());
-                    if (found) {
-                        document.getElementById("product-info").innerHTML = `
-                            📦 <strong>Ürün:</strong> ${found[1]} <br>
-                            📏 <strong>Ölçü:</strong> ${found[2]} <br>
-                            💡 <strong>Ampül:</strong> ${found[4]} <br>
-                            💰 <strong>dip.fiyat:</strong> ${found[6]}₺ <br>
-                            💰 <strong>Fiyat:</strong> ${found[7]}₺ <br>
-                        `;
-                        document.getElementById("barcode-image").src = `${barcode}.jpg`;
-                        document.getElementById("barcode-image").style.display = "block";
-                    } else {
-                        document.getElementById("product-info").innerText = "⚠ Ürün bulunamadı!";
-                    }
                 });
         }
 
-        document.getElementById("search").addEventListener("input", function() {
-            let query = this.value.toLowerCase();
+        document.getElementById("search-btn").addEventListener("click", function() {
+            let query = document.getElementById("search").value.toLowerCase();
             let result = products.find(cols => cols[1]?.toLowerCase().includes(query));
             document.getElementById("product-info").innerText = result ? `Ürün: ${result[1]}` : "Ürün bulunamadı!";
         });
